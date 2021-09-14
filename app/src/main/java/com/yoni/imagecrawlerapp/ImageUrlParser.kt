@@ -5,7 +5,7 @@ import org.jsoup.Jsoup
 import java.util.ArrayList
 
 object ImageUrlParser {
-    private val urlList :ArrayList<String> = ArrayList()
+    val urlList :ArrayList<String> = ArrayList()
 
     fun parseImageUrl(){
         val doc = Jsoup.connect("https://gettyimagesgallery.com/collection/sasha/").get()
