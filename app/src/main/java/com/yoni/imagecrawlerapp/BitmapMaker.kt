@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import java.net.URL
 
-object ImageLoader {
+object BitmapMaker {
 
     fun loadImage(imgUrl: String): Bitmap? {
         val url = URL(imgUrl)

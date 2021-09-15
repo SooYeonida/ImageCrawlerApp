@@ -7,12 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,10 +30,10 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
         }
     }
 
-//    //안하는게 좋음. 재활용성의 장점을 못씀..
-//    override fun getItemViewType(position: Int): Int {
-//        return position
-//    }
+    //안하는게 좋음. 재활용성의 장점을 못씀..
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
 
     override fun getItemCount(): Int {
         return imgUrlList.size;
@@ -54,18 +48,34 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
             //성능 비교용 glide
 //            Glide.with(context).load(url)
 //                .override(600,600)
-//                .skipMemoryCache(true)
-//                .diskCacheStrategy(DiskCacheStrategy.NONE)
+////                .skipMemoryCache(true)
+////                .diskCacheStrategy(DiskCacheStrategy.NONE)
 //                .into(img)
 
-            CoroutineScope(Dispatchers.Main).launch {
-                bitmap = withContext(Dispatchers.IO) {
-                    ImageLoader.loadImage(url)
-                }
+            //원래 구현
+//            CoroutineScope(Dispatchers.Main).launch {
+//                bitmap = withContext(Dispatchers.IO) {
+//                    ImageLoader.loadImage(url)
+//                }
+//                img.setImageBitmap(bitmap)
+//                //bitmap이 남아있어서 이상해보임
+//            }
 
+            if(bitmap!=null){
+                println("캐싱!")
                 img.setImageBitmap(bitmap)
-                //bitmap이 남아있어서 이상해보임
             }
+            else{
+                //img.setImageBitmap(null)
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.IO){
+                        bitmap = BitmapMaker.loadImage(url)
+                        ImageCache.addImageToWarehouse(url, bitmap)
+                    }
+                    img.setImageBitmap(bitmap)
+                }
+            }
+           bitmap = null
         }
     }
 
