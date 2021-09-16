@@ -2,6 +2,7 @@ package com.yoni.imagecrawlerapp
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,15 +26,16 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ItemViewHolder -> {
-                holder.bind(imgUrlList[position])
+                holder.bind(position)
             }
         }
     }
 
     //안하는게 좋음. 재활용성의 장점을 못씀..
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
+//    override fun getItemViewType(position: Int): Int {
+//        //return super.getItemViewType(position);
+//        return position
+//    }
 
     override fun getItemCount(): Int {
         return imgUrlList.size;
@@ -43,39 +45,53 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
         private val img: ImageView = itemView.findViewById<ImageView>(R.id.img)
         private var bitmap: Bitmap? = null
 
-        fun bind(url: String) {
+        fun bind(position: Int) {
 
             //성능 비교용 glide
 //            Glide.with(context).load(url)
 //                .override(600,600)
-////                .skipMemoryCache(true)
-////                .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                .skipMemoryCache(true)
+//                .diskCacheStrategy(DiskCacheStrategy.NONE)
 //                .into(img)
 
             //원래 구현
 //            CoroutineScope(Dispatchers.Main).launch {
+//                img.setImageBitmap(null)
 //                bitmap = withContext(Dispatchers.IO) {
-//                    ImageLoader.loadImage(url)
+//                    BitmapMaker.loadImage(url)
 //                }
 //                img.setImageBitmap(bitmap)
 //                //bitmap이 남아있어서 이상해보임
 //            }
 
-            if(bitmap!=null){
-                println("캐싱!")
+
+            //최신 버전
+//            bitmap = ImageCache.getBitmapFromMemoryCache(url)
+//            if(bitmap!=null){
+//                img.setImageBitmap(bitmap)
+//            }
+//            else{
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    withContext(Dispatchers.IO){
+//                        //bitmap = BitmapMaker.loadImage(url)
+//                        bitmap = BitmapMaker.getImage(url,context) //test
+//                        ImageCache.addBitmapFromMemoryCache(url, bitmap)
+//                    }
+//                    img.setImageBitmap(bitmap)
+//                }
+//            }
+
+            CoroutineScope(Dispatchers.Main).launch {
+                withContext(Dispatchers.IO) {
+                    bitmap = ImageCache.getBitmapFromDiskCache(ImageUrlParser.keyList[position])
+                    if (bitmap == null) {
+                        println("디스크캐시에 없음! 만들기 시작 ")
+                        bitmap = BitmapMaker.makeBitmap(imgUrlList[position], context)
+                    }
+                    ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
+                }
                 img.setImageBitmap(bitmap)
             }
-            else{
-                //img.setImageBitmap(null)
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO){
-                        bitmap = BitmapMaker.loadImage(url)
-                        ImageCache.addImageToWarehouse(url, bitmap)
-                    }
-                    img.setImageBitmap(bitmap)
-                }
-            }
-           bitmap = null
         }
     }
 
