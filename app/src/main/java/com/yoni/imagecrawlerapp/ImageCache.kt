@@ -29,19 +29,16 @@ object ImageCache {
     private val diskCacheLockCondition: Condition = diskCacheLock.newCondition()
     private var diskCacheStarting = true
 
-    const val IO_BUFFER_SIZE = 8 * 1024
-    private var mCompressFormat = Bitmap.CompressFormat.JPEG
-    private var mCompressQuality = 70
+    private const val IO_BUFFER_SIZE = 8 * 1024
+    private val mCompressFormat = Bitmap.CompressFormat.JPEG
+    private const val mCompressQuality = 70
 
     fun initializeCache(context: Context) {
         //메모리캐시
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
         val cacheSize = maxMemory / 8
-        println("cache size = $cacheSize")
         memoryLruCache = object : LruCache<String, Bitmap>(cacheSize) {
             override fun sizeOf(key: String, bitmap: Bitmap): Int {
-                // The cache size will be measured in kilobytes rather than
-                // number of items.
                 val bitmapByteCount = bitmap.rowBytes * bitmap.height
                 return bitmapByteCount / 1024
             }
@@ -52,8 +49,8 @@ object ImageCache {
         CoroutineScope(Dispatchers.IO).launch {
             diskCacheLock.withLock {
                 diskLruCache = DiskLruCache.open(cacheDir, 1, 1, DISK_CACHE_SIZE)
-                diskCacheStarting = false // Finished initialization
-                diskCacheLockCondition.signalAll() // Wake any waiting threads
+                diskCacheStarting = false
+                diskCacheLockCondition.signalAll()
             }
         }
     }
@@ -112,17 +109,17 @@ object ImageCache {
                 diskLruCache!!.flush()
                 editor.commit()
                 if (BuildConfig.DEBUG) {
-                    Log.d("cache_test_DISK_", "image put on disk cache $key")
+                    Log.d("cache_DISK_", "image put on disk cache $key")
                 }
             } else {
                 editor.abort()
                 if (BuildConfig.DEBUG) {
-                    Log.d("cache_test_DISK_", "ERROR on: image put on disk cache $key")
+                    Log.d("cache_DISK_", "ERROR on: image put on disk cache $key")
                 }
             }
         } catch (e: IOException) {
             if (BuildConfig.DEBUG) {
-                Log.d("cache_test_DISK_", "ERROR on: image put on disk cache $key")
+                Log.d("cache_DISK_", "ERROR on: image put on disk cache $key")
             }
             try {
                 editor?.abort()
@@ -140,6 +137,18 @@ object ImageCache {
         } finally {
             out?.close()
         }
+    }
+
+    fun getBitmapFromCache(key: String):Bitmap?{
+        var bitmap : Bitmap? = getBitmapFromMemoryCache(key)
+        if(bitmap == null){
+            bitmap = getBitmapFromDiskCache(key)
+           //  Log.d("cache_DISK_", "image read from disk $key")
+        }
+        else{
+           //  Log.d("cache_MEMORY_","image read from memory $key")
+        }
+        return bitmap
     }
 
     private fun getBitmapFromMemoryCache(key: String?): Bitmap? {
@@ -183,9 +192,7 @@ object ImageCache {
         } finally {
             snapshot?.close()
         }
-        if (BuildConfig.DEBUG) {
-            Log.d("cache_test_DISK_", if (bitmap == null) "" else "image read from disk $key")
-        }
+
         return bitmap
     }
 

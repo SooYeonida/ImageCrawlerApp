@@ -10,7 +10,7 @@ object ImageUrlParser {
 
     fun parseImageUrl(){
         val doc = Jsoup.connect("https://gettyimagesgallery.com/collection/sasha/").get()
-        Log.d("TTT","connection setup and parsing start")
+        Log.d("parse Url","connection setup and parsing start")
         val elements = doc.select("div.item-wrapper img.jq-lazy")
         for( e in elements){
             val url : String = e.attr("data-src")
@@ -18,7 +18,7 @@ object ImageUrlParser {
             keyList.add(key)
             urlList.add(url)
         }
-        Log.d("TTT","parsing done")
+        Log.d("parse Url","parsing done")
     }
 
 }

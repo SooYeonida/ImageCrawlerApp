@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,10 +34,9 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
     }
 
     //안하는게 좋음. 재활용성의 장점을 못씀..
-//    override fun getItemViewType(position: Int): Int {
-//        //return super.getItemViewType(position);
-//        return position
-//    }
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
 
     override fun getItemCount(): Int {
         return imgUrlList.size;
@@ -48,10 +49,10 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
         fun bind(position: Int) {
 
             //성능 비교용 glide
-//            Glide.with(context).load(url)
+//            Glide.with(context).load(ImageUrlParser.urlList[position])
 //                .override(600,600)
-//                .skipMemoryCache(true)
-//                .diskCacheStrategy(DiskCacheStrategy.NONE)
+////                .skipMemoryCache(true)
+////                .diskCacheStrategy(DiskCacheStrategy.NONE)
 //                .into(img)
 
             //원래 구현
@@ -83,9 +84,9 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
 
             CoroutineScope(Dispatchers.Main).launch {
                 withContext(Dispatchers.IO) {
-                    bitmap = ImageCache.getBitmapFromDiskCache(ImageUrlParser.keyList[position])
+                    //bitmap = ImageCache.getBitmapFromDiskCache(ImageUrlParser.keyList[position])
+                    bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position]) //test
                     if (bitmap == null) {
-                        println("디스크캐시에 없음! 만들기 시작 ")
                         bitmap = BitmapMaker.makeBitmap(imgUrlList[position], context)
                     }
                     ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
