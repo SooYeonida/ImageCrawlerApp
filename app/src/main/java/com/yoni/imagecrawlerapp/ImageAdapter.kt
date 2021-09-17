@@ -79,9 +79,9 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
 //                }
 //            }
 
-            CoroutineScope(Dispatchers.Main).launch {
+//            CoroutineScope(Dispatchers.Main).launch {
                 bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
-                withContext(Dispatchers.IO) {
+            CoroutineScope(Dispatchers.IO).launch{
                     //bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
                     //-> 빠르게 스크롤시 데이터 변경이 잘 보임
                     if (bitmap == null) {
@@ -90,7 +90,7 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
                     ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
                 }
                 img.setImageBitmap(bitmap)
-            }
+//            }
         }
     }
 
