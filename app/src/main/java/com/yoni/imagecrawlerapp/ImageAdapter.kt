@@ -2,14 +2,11 @@ package com.yoni.imagecrawlerapp
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,9 +31,9 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
     }
 
     //안하는게 좋음. 재활용성의 장점을 못씀..
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
+//    override fun getItemViewType(position: Int): Int {
+//        return position
+//    }
 
     override fun getItemCount(): Int {
         return imgUrlList.size;
@@ -83,11 +80,12 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
 //            }
 
             CoroutineScope(Dispatchers.Main).launch {
+                bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
                 withContext(Dispatchers.IO) {
-                    //bitmap = ImageCache.getBitmapFromDiskCache(ImageUrlParser.keyList[position])
-                    bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position]) //test
+                    //bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
+                    //-> 빠르게 스크롤시 데이터 변경이 잘 보임
                     if (bitmap == null) {
-                        bitmap = BitmapMaker.makeBitmap(imgUrlList[position], context)
+                        bitmap = BitmapMaker.makeSampleBitmap(imgUrlList[position], context)
                     }
                     ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
                 }

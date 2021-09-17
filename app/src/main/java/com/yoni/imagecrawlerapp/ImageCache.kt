@@ -33,6 +33,7 @@ object ImageCache {
     private val mCompressFormat = Bitmap.CompressFormat.JPEG
     private const val mCompressQuality = 70
 
+    //캐시 초기화
     fun initializeCache(context: Context) {
         //메모리캐시
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
@@ -55,9 +56,8 @@ object ImageCache {
         }
     }
 
+
     private fun getDiskCacheDir(context: Context, uniqueName: String): File {
-        // Check if media is mounted or storage is built-in, if so, try and use external cache dir
-        // otherwise use internal cache dir
         val cachePath =
             if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
                 || !isExternalStorageRemovable()) {
@@ -143,10 +143,10 @@ object ImageCache {
         var bitmap : Bitmap? = getBitmapFromMemoryCache(key)
         if(bitmap == null){
             bitmap = getBitmapFromDiskCache(key)
-           //  Log.d("cache_DISK_", "image read from disk $key")
+             Log.d("cache_DISK_", "image read from disk $key")
         }
         else{
-           //  Log.d("cache_MEMORY_","image read from memory $key")
+             Log.d("cache_MEMORY_","image read from memory $key")
         }
         return bitmap
     }
@@ -159,7 +159,7 @@ object ImageCache {
         }
     }
 
-    fun getBitmapFromDiskCache(key: String): Bitmap? {
+    private fun getBitmapFromDiskCache(key: String): Bitmap? {
         diskCacheLock.withLock {
             // Wait while disk cache is started from background thread
             while (diskCacheStarting) {
@@ -169,12 +169,12 @@ object ImageCache {
                 }
 
             }
-            return getBitmap(key)
+            return getBitmapFromSnapshot(key)
         }
     }
 
 
-    private fun getBitmap(key: String): Bitmap? {
+    private fun getBitmapFromSnapshot(key: String): Bitmap? {
         var bitmap: Bitmap? = null
         var snapshot: DiskLruCache.Snapshot? = null
         try {

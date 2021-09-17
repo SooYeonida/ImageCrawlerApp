@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         CoroutineScope(Dispatchers.IO).launch {
+            println("이미지 파싱 시작 ")
             ImageUrlParser.parseImageUrl()//이미지 url 파싱
-
             ImageCache.initializeCache(applicationContext) // test
 
             //데이터 리사이클러뷰 로드

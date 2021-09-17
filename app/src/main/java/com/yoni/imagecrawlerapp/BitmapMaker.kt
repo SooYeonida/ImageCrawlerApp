@@ -8,13 +8,12 @@ import java.net.URL
 
 object BitmapMaker {
 
-    fun makeBitmap(imgUrl: String, context: Context):Bitmap? {
+    //축소된 사이즈로 비트맵 생성
+    fun makeSampleBitmap(imgUrl: String, context: Context):Bitmap? {
         val options: BitmapFactory.Options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
 
         val url = URL(imgUrl)
-//        val stream = url.openStream()
-//        BitmapFactory.decodeStream(stream,null,options)
 
         //핸드폰 해상도에 맞게 - 행과 열에 3개씩 들어간다고 가정
         val reqWidth = context.resources.displayMetrics.widthPixels/3
@@ -27,6 +26,7 @@ object BitmapMaker {
     }
 
 
+    //샘플사이즈 계산
     private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
         val height = options.outHeight
         val width = options.outWidth
