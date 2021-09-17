@@ -1,23 +1,24 @@
 package com.yoni.imagecrawlerapp
 
 import android.util.Log
+import org.jsoup.Connection
 import org.jsoup.Jsoup
-import java.lang.Exception
+import org.jsoup.select.Elements
 import java.util.ArrayList
 
 object ImageUrlParser {
-    val urlList :ArrayList<String> = ArrayList()
-    val keyList :ArrayList<String> = ArrayList()
+    val urlList: ArrayList<String> = ArrayList()
+    val keyList: ArrayList<String> = ArrayList()
+
+    lateinit var con : Connection
+    lateinit var elements : Elements
 
     fun parseImageUrl(){
-        try {
-            val doc = Jsoup.connect("https://gettyimagesgallery.com/collection/sasha/").get()
+        try{
+            con = Jsoup.connect("https://gettyimagesgallery.com/collection/sasha/").timeout(5000)
             Log.d("parse Url", "connection setup and parsing start")
-            val elements = doc.select("div.item-wrapper img.jq-lazy")
-            if(elements.isEmpty()){
-                //재연결 시도?
-            }
-            else {
+            elements = con.get().select("div.item-wrapper img.jq-lazy")
+            if (!elements.isEmpty()) {
                 for (e in elements) {
                     val url: String = e.attr("data-src")
                     //DiskLruCache key 형식 제한 때문에 잘라야함
@@ -27,8 +28,13 @@ object ImageUrlParser {
                 }
                 Log.d("parse Url", "parsing done")
             }
+            else{
+                NetworkDialog.show()
+            }
+
         }catch (e:Exception){
             e.printStackTrace()
+            NetworkDialog.show()
         }
     }
 
