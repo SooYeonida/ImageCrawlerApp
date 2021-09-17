@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory
 import java.net.URL
 
 
-object BitmapMaker {
+class BitmapMaker {
 
     //축소된 사이즈로 비트맵 생성
     fun makeSampleBitmap(imgUrl: String, context: Context):Bitmap? {

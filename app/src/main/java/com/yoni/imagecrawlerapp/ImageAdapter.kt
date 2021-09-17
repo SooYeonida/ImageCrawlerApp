@@ -85,7 +85,7 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
                     //bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
                     //-> 빠르게 스크롤시 데이터 변경이 잘 보임
                     if (bitmap == null) {
-                        bitmap = BitmapMaker.makeSampleBitmap(imgUrlList[position], context)
+                        bitmap = BitmapMaker().makeSampleBitmap(imgUrlList[position], context)
                     }
                     ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
                 }
