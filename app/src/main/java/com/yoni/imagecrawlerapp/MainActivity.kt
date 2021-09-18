@@ -2,8 +2,8 @@ package com.yoni.imagecrawlerapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import com.yoni.imagecrawlerapp.Adapter.ImageAdapter
 import com.yoni.imagecrawlerapp.Data.CacheData
 import com.yoni.imagecrawlerapp.Network.NetworkDialog
@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         else{
+            Log.d("network", "network fail")
             showNetworkDialog()
         }
     }

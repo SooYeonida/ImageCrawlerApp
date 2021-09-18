@@ -6,11 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.yoni.imagecrawlerapp.Bitmap.BitmapMaker
 import com.yoni.imagecrawlerapp.Data.CacheData
-import com.yoni.imagecrawlerapp.R
 import com.yoni.imagecrawlerapp.Data.UrlData
+import com.yoni.imagecrawlerapp.databinding.GridItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,9 +22,10 @@ import java.util.*
 class ImageAdapter(private val context: Context, private val imgUrlList: ArrayList<String>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    lateinit var binding: GridItemBinding
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.grid_item, parent, false)
-        return ItemViewHolder(view)
+        binding = GridItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ItemViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -34,36 +36,35 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
         }
     }
 
-    //안하는게 좋음. 재활용성의 장점을 못씀..
-//    override fun getItemViewType(position: Int): Int {
-//        return position
-//    }
-
     override fun getItemCount(): Int {
         return imgUrlList.size;
     }
 
-    inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val img: ImageView = itemView.findViewById<ImageView>(R.id.img)
-        private var bitmap: Bitmap? = null
+    inner class ItemViewHolder(private val binding: GridItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(position: Int){
-            bitmap = CacheData.getBitmapFromCache(UrlData.keyList[position])
-            if (bitmap != null) {
-                img.setImageBitmap(bitmap)
-            } else {
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO) {
-                        if (bitmap == null) {
-                            bitmap = BitmapMaker().makeSampleBitmap(imgUrlList[position], context)
-                        }
-                        CacheData.addBitmapToCache(UrlData.keyList[position], bitmap!!)
-                    }
-                    img.setImageBitmap(bitmap)
-                }
-            }
+        fun bind(position: Int) {
+            binding.urlPosition = position
         }
     }
 
+}
+
+@BindingAdapter("imgFromUrl")
+fun setImage(imageView: ImageView, urlPosition: Int) {
+    var bitmap: Bitmap? = CacheData.getBitmapFromCache(UrlData.keyList[urlPosition])
+    if (bitmap != null) {
+        imageView.setImageBitmap(bitmap)
+    } else {
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                if (bitmap == null) {
+                    bitmap = BitmapMaker().makeSampleBitmap(UrlData.urlList[urlPosition], imageView.context)
+                }
+                CacheData.addBitmapToCache(UrlData.keyList[urlPosition], bitmap!!)
+            }
+            imageView.setImageBitmap(bitmap)
+        }
+    }
 }
 

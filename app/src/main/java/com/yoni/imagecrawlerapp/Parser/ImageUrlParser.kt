@@ -24,11 +24,13 @@ class ImageUrlParser(private val mContext: Context) {
             }
             else{
                 //데이터 못받아올 경우
+                Log.d("parse Url", "data load fail")
                 (mContext as MainActivity).showNetworkDialog()
             }
         }catch (e:Exception){
             //time out, unknown host etc
             e.printStackTrace()
+            Log.d("parse Url", "time out, unknown host etc")
             (mContext as MainActivity).showNetworkDialog()
         }
     }
