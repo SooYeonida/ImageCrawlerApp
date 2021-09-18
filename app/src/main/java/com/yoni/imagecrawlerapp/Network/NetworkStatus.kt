@@ -31,10 +31,8 @@ class NetworkStatus(private val mContext: Context) {
         val connectivityManager = mContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            println("post")
             postAndroidMInternetCheck(connectivityManager)
         } else {
-            println("pre")
             preAndroidMInternetCheck(connectivityManager)
         }
     }

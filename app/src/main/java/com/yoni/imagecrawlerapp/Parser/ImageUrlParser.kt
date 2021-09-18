@@ -22,10 +22,10 @@ class ImageUrlParser(private val mContext: Context) {
                 }
                 Log.d("parse Url", "parsing done")
             }
-//            else{
-//                //무슨 경우더라
-//                NetworkDialog.show()
-//            }
+            else{
+                //데이터 못받아올 경우
+                (mContext as MainActivity).showNetworkDialog()
+            }
         }catch (e:Exception){
             //time out, unknown host etc
             e.printStackTrace()

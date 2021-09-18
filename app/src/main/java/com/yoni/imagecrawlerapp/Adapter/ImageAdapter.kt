@@ -47,42 +47,7 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
         private val img: ImageView = itemView.findViewById<ImageView>(R.id.img)
         private var bitmap: Bitmap? = null
 
-        fun bind(position: Int) {
-
-            //성능 비교용 glide
-//            Glide.with(context).load(ImageUrlParser.urlList[position])
-//                .override(600,600)
-////                .skipMemoryCache(true)
-////                .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                .into(img)
-
-            //원래 구현
-//            CoroutineScope(Dispatchers.Main).launch {
-//                img.setImageBitmap(null)
-//                bitmap = withContext(Dispatchers.IO) {
-//                    BitmapMaker.loadImage(url)
-//                }
-//                img.setImageBitmap(bitmap)
-//                //bitmap이 남아있어서 이상해보임
-//            }
-
-
-            //최신 버전
-//            bitmap = ImageCache.getBitmapFromMemoryCache(url)
-//            if(bitmap!=null){
-//                img.setImageBitmap(bitmap)
-//            }
-//            else{
-//                CoroutineScope(Dispatchers.Main).launch {
-//                    withContext(Dispatchers.IO){
-//                        //bitmap = BitmapMaker.loadImage(url)
-//                        bitmap = BitmapMaker.getImage(url,context) //test
-//                        ImageCache.addBitmapFromMemoryCache(url, bitmap)
-//                    }
-//                    img.setImageBitmap(bitmap)
-//                }
-//            }
-
+        fun bind(position: Int){
             bitmap = CacheData.getBitmapFromCache(UrlData.keyList[position])
             if (bitmap != null) {
                 img.setImageBitmap(bitmap)

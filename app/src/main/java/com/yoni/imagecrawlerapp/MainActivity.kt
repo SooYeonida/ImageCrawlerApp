@@ -2,6 +2,8 @@ package com.yoni.imagecrawlerapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
 import com.yoni.imagecrawlerapp.Adapter.ImageAdapter
 import com.yoni.imagecrawlerapp.Data.CacheData
 import com.yoni.imagecrawlerapp.Network.NetworkDialog
@@ -28,11 +30,13 @@ class MainActivity : AppCompatActivity() {
 
 
     fun loadImage(){
+        loading.visibility = View.VISIBLE
         if(networkCheck.isConnectionOn()) {
             CoroutineScope(Dispatchers.IO).launch {
                 requestImageUrl()
                 withContext(Dispatchers.Main) {
                     initRecyclerView()
+                    loading.visibility = View.GONE
                 }
             }
         }
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showNetworkDialog(){
+        loading.visibility = View.GONE
         NetworkDialog.show()
     }
 
