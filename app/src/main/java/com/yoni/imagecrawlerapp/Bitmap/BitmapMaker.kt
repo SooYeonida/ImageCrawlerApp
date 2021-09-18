@@ -1,4 +1,4 @@
-package com.yoni.imagecrawlerapp
+package com.yoni.imagecrawlerapp.Bitmap
 
 import android.content.Context
 import android.graphics.Bitmap

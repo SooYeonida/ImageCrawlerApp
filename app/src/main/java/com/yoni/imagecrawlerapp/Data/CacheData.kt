@@ -1,4 +1,4 @@
-package com.yoni.imagecrawlerapp
+package com.yoni.imagecrawlerapp.Data
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -8,6 +8,7 @@ import android.os.Environment.isExternalStorageRemovable
 import android.util.Log
 import android.util.LruCache
 import com.jakewharton.disklrucache.DiskLruCache
+import com.yoni.imagecrawlerapp.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 
-object ImageCache {
+object CacheData {
     //메모리캐시
     private var memoryLruCache: LruCache<String, Bitmap>? = null
 
@@ -76,7 +77,7 @@ object ImageCache {
     }
 
     fun addBitmapToCache(key: String?, value: Bitmap){
-        if(getBitmapFromMemoryCache(key)==null){
+        if(getBitmapFromMemoryCache(key) ==null){
             memoryLruCache?.put(key, value)
         }
 
@@ -137,7 +138,7 @@ object ImageCache {
     private fun writeBitmapToFile(bitmap: Bitmap, editor: DiskLruCache.Editor): Boolean {
         var out: OutputStream? = null
         return try {
-            out = BufferedOutputStream(editor.newOutputStream(0),IO_BUFFER_SIZE)
+            out = BufferedOutputStream(editor.newOutputStream(0), IO_BUFFER_SIZE)
             bitmap.compress(mCompressFormat, mCompressQuality, out)
         } finally {
             out?.close()
@@ -189,7 +190,7 @@ object ImageCache {
             }
             val `in` = snapshot.getInputStream(0)
             if (`in` != null) {
-                val buffIn = BufferedInputStream(`in`,IO_BUFFER_SIZE)
+                val buffIn = BufferedInputStream(`in`, IO_BUFFER_SIZE)
                 bitmap = BitmapFactory.decodeStream(buffIn)
             }
         } catch (e: IOException) {

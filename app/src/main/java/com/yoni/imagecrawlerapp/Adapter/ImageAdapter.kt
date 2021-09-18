@@ -1,4 +1,4 @@
-package com.yoni.imagecrawlerapp
+package com.yoni.imagecrawlerapp.Adapter
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,6 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.yoni.imagecrawlerapp.Bitmap.BitmapMaker
+import com.yoni.imagecrawlerapp.Data.CacheData
+import com.yoni.imagecrawlerapp.R
+import com.yoni.imagecrawlerapp.Data.UrlData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -79,7 +83,7 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
 //                }
 //            }
 
-            bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
+            bitmap = CacheData.getBitmapFromCache(UrlData.keyList[position])
             if (bitmap != null) {
                 img.setImageBitmap(bitmap)
             } else {
@@ -88,7 +92,7 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
                         if (bitmap == null) {
                             bitmap = BitmapMaker().makeSampleBitmap(imgUrlList[position], context)
                         }
-                        ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
+                        CacheData.addBitmapToCache(UrlData.keyList[position], bitmap!!)
                     }
                     img.setImageBitmap(bitmap)
                 }
