@@ -9,7 +9,7 @@ import org.jsoup.Jsoup
 class ImageUrlParser(private val mContext: Context) {
     fun parseImageUrl(){
         try{
-            val con = Jsoup.connect("https://gettyimagesgallery.com/collection/sasha/").timeout(5000)
+            val con = Jsoup.connect("https://gettyimagesgallery.com/collection/sasha/").timeout(10000)
             Log.d("parse Url", "connection setup and parsing start")
             val elements = con.get().select("div.item-wrapper img.jq-lazy")
             if (!elements.isEmpty()) {
