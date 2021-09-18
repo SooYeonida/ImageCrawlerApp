@@ -79,18 +79,20 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
 //                }
 //            }
 
-//            CoroutineScope(Dispatchers.Main).launch {
-                bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
-            CoroutineScope(Dispatchers.IO).launch{
-                    //bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
-                    //-> 빠르게 스크롤시 데이터 변경이 잘 보임
-                    if (bitmap == null) {
-                        bitmap = BitmapMaker().makeSampleBitmap(imgUrlList[position], context)
-                    }
-                    ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
-                }
+            bitmap = ImageCache.getBitmapFromCache(ImageUrlParser.keyList[position])
+            if (bitmap != null) {
                 img.setImageBitmap(bitmap)
-//            }
+            } else {
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.IO) {
+                        if (bitmap == null) {
+                            bitmap = BitmapMaker().makeSampleBitmap(imgUrlList[position], context)
+                        }
+                        ImageCache.addBitmapToCache(ImageUrlParser.keyList[position], bitmap!!)
+                    }
+                    img.setImageBitmap(bitmap)
+                }
+            }
         }
     }
 
