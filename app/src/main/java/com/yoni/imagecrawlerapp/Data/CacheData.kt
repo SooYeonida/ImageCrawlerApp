@@ -20,15 +20,15 @@ import kotlin.concurrent.withLock
 
 object CacheData {
     //메모리캐시
-    private var memoryLruCache: LruCache<String, Bitmap>? = null
+    private var mMemoryLruCache: LruCache<String, Bitmap>? = null
 
     //디스크캐시
     private const val DISK_CACHE_SIZE : Long = 1024 * 1024 * 10 // 10MB
     private const val DISK_CACHE_SUBDIR = "thumbnails"
-    private var diskLruCache: DiskLruCache? = null
-    private val diskCacheLock = ReentrantLock()
-    private val diskCacheLockCondition: Condition = diskCacheLock.newCondition()
-    private var diskCacheStarting = true
+    private var mDiskLruCache: DiskLruCache? = null
+    private val mDiskCacheLock = ReentrantLock()
+    private val mDiskCacheLockCondition: Condition = mDiskCacheLock.newCondition()
+    private var mDiskCacheStarting = true
 
     private const val IO_BUFFER_SIZE = 8 * 1024
     private val mCompressFormat = Bitmap.CompressFormat.JPEG
@@ -39,7 +39,7 @@ object CacheData {
         //메모리캐시
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
         val cacheSize = maxMemory / 8
-        memoryLruCache = object : LruCache<String, Bitmap>(cacheSize) {
+        mMemoryLruCache = object : LruCache<String, Bitmap>(cacheSize) {
             override fun sizeOf(key: String, bitmap: Bitmap): Int {
                 val bitmapByteCount = bitmap.rowBytes * bitmap.height
                 return bitmapByteCount / 1024
@@ -49,10 +49,10 @@ object CacheData {
         //디스크캐시
         val cacheDir = getDiskCacheDir(context, DISK_CACHE_SUBDIR)
         CoroutineScope(Dispatchers.IO).launch {
-            diskCacheLock.withLock {
-                diskLruCache = DiskLruCache.open(cacheDir, 1, 1, DISK_CACHE_SIZE)
-                diskCacheStarting = false
-                diskCacheLockCondition.signalAll()
+            mDiskCacheLock.withLock {
+                mDiskLruCache = DiskLruCache.open(cacheDir, 1, 1, DISK_CACHE_SIZE)
+                mDiskCacheStarting = false
+                mDiskCacheLockCondition.signalAll()
             }
         }
     }
@@ -78,11 +78,11 @@ object CacheData {
 
     fun addBitmapToCache(key: String?, value: Bitmap){
         if(getBitmapFromMemoryCache(key) ==null){
-            memoryLruCache?.put(key, value)
+            mMemoryLruCache?.put(key, value)
         }
 
-        synchronized(diskCacheLock){
-            diskLruCache?.apply {
+        synchronized(mDiskCacheLock){
+            mDiskLruCache?.apply {
                 if(!containsKey(key)){
                     put(key, value)
                 }
@@ -94,7 +94,7 @@ object CacheData {
         var contained = false
         var snapshot: DiskLruCache.Snapshot? = null
         try {
-            snapshot = diskLruCache!![key]
+            snapshot = mDiskLruCache!![key]
             contained = snapshot != null
         } catch (e: IOException) {
             e.printStackTrace()
@@ -107,12 +107,12 @@ object CacheData {
     private fun put(key: String?, data: Bitmap) {
         var editor: DiskLruCache.Editor? = null
         try {
-            editor = diskLruCache!!.edit(key)
+            editor = mDiskLruCache!!.edit(key)
             if (editor == null) {
                 return
             }
             if (writeBitmapToFile(data, editor)) {
-                diskLruCache!!.flush()
+                mDiskLruCache!!.flush()
                 editor.commit()
                 if (BuildConfig.DEBUG) {
                     Log.d("cache_DISK_", "image put on disk cache $key")
@@ -159,18 +159,18 @@ object CacheData {
 
     private fun getBitmapFromMemoryCache(key: String?): Bitmap? {
         return if (key != null) {
-            memoryLruCache?.get(key)
+            mMemoryLruCache?.get(key)
         } else {
             null
         }
     }
 
     private fun getBitmapFromDiskCache(key: String): Bitmap? {
-        diskCacheLock.withLock {
+        mDiskCacheLock.withLock {
             // Wait while disk cache is started from background thread
-            while (diskCacheStarting) {
+            while (mDiskCacheStarting) {
                 try {
-                    diskCacheLockCondition.await()
+                    mDiskCacheLockCondition.await()
                 } catch (e: InterruptedException) {
                 }
 
@@ -184,7 +184,7 @@ object CacheData {
         var bitmap: Bitmap? = null
         var snapshot: DiskLruCache.Snapshot? = null
         try {
-            snapshot = diskLruCache?.get(key)
+            snapshot = mDiskLruCache?.get(key)
             if (snapshot == null) {
                 return null
             }

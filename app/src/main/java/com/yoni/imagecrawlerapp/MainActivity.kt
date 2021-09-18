@@ -9,7 +9,6 @@ import com.yoni.imagecrawlerapp.Data.CacheData
 import com.yoni.imagecrawlerapp.Network.NetworkDialog
 import com.yoni.imagecrawlerapp.Network.NetworkStatus
 import com.yoni.imagecrawlerapp.Parser.ImageUrlParser
-import com.yoni.imagecrawlerapp.Data.UrlData
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +16,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var adapter: ImageAdapter
-    private val networkCheck = NetworkStatus(this)
+    private lateinit var mAdapter: ImageAdapter
+    private val mNetworkCheck = NetworkStatus(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +27,9 @@ class MainActivity : AppCompatActivity() {
         loadImage()
     }
 
-
     fun loadImage(){
         loading.visibility = View.VISIBLE
-        if(networkCheck.isConnectionOn()) {
+        if(mNetworkCheck.isConnectionOn()) {
             CoroutineScope(Dispatchers.IO).launch {
                 requestImageUrl()
                 withContext(Dispatchers.Main) {
@@ -57,8 +55,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView(){
-        adapter = ImageAdapter(applicationContext, UrlData.urlList)
-        recyclerView.adapter = adapter
+        mAdapter = ImageAdapter(applicationContext)
+        recyclerView.adapter = mAdapter
         recyclerView.setHasFixedSize(true)
     }
 

@@ -3,7 +3,6 @@ package com.yoni.imagecrawlerapp.Adapter
 import android.content.Context
 import android.graphics.Bitmap
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -16,16 +15,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
 
-class ImageAdapter(private val context: Context, private val imgUrlList: ArrayList<String>) :
+class ImageAdapter(private val mContext: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    lateinit var binding: GridItemBinding
+    lateinit var mBinding: GridItemBinding
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        binding = GridItemBinding.inflate(LayoutInflater.from(context), parent, false)
-        return ItemViewHolder(binding)
+        mBinding = GridItemBinding.inflate(LayoutInflater.from(mContext), parent, false)
+        return ItemViewHolder(mBinding)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -37,7 +35,7 @@ class ImageAdapter(private val context: Context, private val imgUrlList: ArrayLi
     }
 
     override fun getItemCount(): Int {
-        return imgUrlList.size;
+        return UrlData.urlList.size
     }
 
     inner class ItemViewHolder(private val binding: GridItemBinding) :
